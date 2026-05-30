@@ -1,5 +1,6 @@
 const express = require("express");
-const authRoutes = require("./routes/authRouter");
+const authRoutes = require("./routes/authRoutes");
+const taskRoutes = require("./routes/taskRoutes");
 const cors = require("cors");
 const app = express();
 const errorMiddleware = require("./middleware/errorMiddleware");
@@ -13,5 +14,6 @@ app.get("/", (req, res) => {
   });
 });
 app.use("/api/auth", authRoutes);
+app.use("/api/tasks", taskRoutes);
 app.use(errorMiddleware);
 module.exports = app;
