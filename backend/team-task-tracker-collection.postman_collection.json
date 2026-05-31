@@ -27,15 +27,9 @@
             "url": {
               "raw": "http://localhost:5000/api/auth/register",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "5000",
-              "path": [
-                "api",
-                "auth",
-                "register"
-              ]
+              "path": ["api", "auth", "register"]
             }
           },
           "response": []
@@ -57,15 +51,9 @@
             "url": {
               "raw": "http://localhost:5000/api/auth/login",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "5000",
-              "path": [
-                "api",
-                "auth",
-                "login"
-              ]
+              "path": ["api", "auth", "login"]
             }
           },
           "response": []
@@ -87,15 +75,9 @@
             "url": {
               "raw": "http://localhost:5000/api/auth/refresh-token",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "5000",
-              "path": [
-                "api",
-                "auth",
-                "refresh-token"
-              ]
+              "path": ["api", "auth", "refresh-token"]
             }
           },
           "response": []
@@ -123,15 +105,9 @@
             "url": {
               "raw": "http://localhost:5000/api/auth/login",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "5000",
-              "path": [
-                "api",
-                "auth",
-                "login"
-              ]
+              "path": ["api", "auth", "login"]
             }
           },
           "response": []
@@ -159,15 +135,9 @@
             "url": {
               "raw": "http://localhost:5000/api/auth/login",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "5000",
-              "path": [
-                "api",
-                "auth",
-                "login"
-              ]
+              "path": ["api", "auth", "login"]
             }
           },
           "response": []
@@ -200,14 +170,9 @@
             "url": {
               "raw": "http://localhost:5000/api/tasks",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "5000",
-              "path": [
-                "api",
-                "tasks"
-              ]
+              "path": ["api", "tasks"]
             }
           },
           "response": []
@@ -233,14 +198,9 @@
             "url": {
               "raw": "http://localhost:5000/api/tasks",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "5000",
-              "path": [
-                "api",
-                "tasks"
-              ]
+              "path": ["api", "tasks"]
             }
           },
           "response": []
@@ -266,15 +226,9 @@
             "url": {
               "raw": "http://localhost:5000/api/tasks/6a1c8a1ec649622c0fe6703d",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "5000",
-              "path": [
-                "api",
-                "tasks",
-                "6a1c8a1ec649622c0fe6703d"
-              ]
+              "path": ["api", "tasks", "6a1c8a1ec649622c0fe6703d"]
             }
           },
           "response": []
@@ -300,15 +254,9 @@
             "url": {
               "raw": "http://localhost:5000/api/tasks/6a1c8a1ec649622c0fe6703d",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "5000",
-              "path": [
-                "api",
-                "tasks",
-                "6a1c8a1ec649622c0fe6703d"
-              ]
+              "path": ["api", "tasks", "6a1c8a1ec649622c0fe6703d"]
             }
           },
           "response": []
@@ -336,16 +284,9 @@
             "url": {
               "raw": "http://localhost:5000/api/tasks/6a1c8a1ec649622c0fe6703d/status",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "5000",
-              "path": [
-                "api",
-                "tasks",
-                "6a1c8a1ec649622c0fe6703d",
-                "status"
-              ]
+              "path": ["api", "tasks", "6a1c8a1ec649622c0fe6703d", "status"]
             }
           },
           "response": []
@@ -368,15 +309,9 @@
             "url": {
               "raw": "http://localhost:5000/api/tasks/6a1c8a1ec649622c0fe6703d",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "5000",
-              "path": [
-                "api",
-                "tasks",
-                "6a1c8a1ec649622c0fe6703d"
-              ]
+              "path": ["api", "tasks", "6a1c8a1ec649622c0fe6703d"]
             }
           },
           "response": []
@@ -409,14 +344,9 @@
             "url": {
               "raw": "http://localhost:5000/api/tasks",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "5000",
-              "path": [
-                "api",
-                "tasks"
-              ]
+              "path": ["api", "tasks"]
             }
           },
           "response": []
@@ -444,14 +374,9 @@
             "url": {
               "raw": "http://localhost:5000/api/users",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "5000",
-              "path": [
-                "api",
-                "users"
-              ]
+              "path": ["api", "users"]
             }
           },
           "response": []
@@ -479,14 +404,9 @@
             "url": {
               "raw": "http://localhost:5000/api/users",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "5000",
-              "path": [
-                "api",
-                "users"
-              ]
+              "path": ["api", "users"]
             }
           },
           "response": []
@@ -514,14 +434,9 @@
             "url": {
               "raw": "http://localhost:5000/api/users",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "5000",
-              "path": [
-                "api",
-                "users"
-              ]
+              "path": ["api", "users"]
             }
           },
           "response": []
@@ -549,15 +464,9 @@
             "url": {
               "raw": "http://localhost:5000/api/tasks/6a1c8f126eae82a94e639536",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "5000",
-              "path": [
-                "api",
-                "tasks",
-                "6a1c8f126eae82a94e639536"
-              ]
+              "path": ["api", "tasks", "6a1c8f126eae82a94e639536"]
             }
           },
           "response": []
@@ -585,15 +494,9 @@
             "url": {
               "raw": "http://localhost:5000/api/tasks/6a1c9ad4600968ace74eec84",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "5000",
-              "path": [
-                "api",
-                "tasks",
-                "6a1c9ad4600968ace74eec84"
-              ]
+              "path": ["api", "tasks", "6a1c9ad4600968ace74eec84"]
             }
           },
           "response": []
