@@ -1,151 +1,209 @@
 # Team Task Tracker API
 
-## SDE II Take-Home Assignment
+REST API for managing team tasks with authentication, role-based access control, Redis caching, and Dockerized deployment.
 
-This is the backend for a simple team task tracker built as part of an SDE II take-home assignment.
-It includes authentication, role-based authorization, task management, Redis caching, and a Docker-based setup so the reviewer can run it with `docker compose up`.
+## Tech Stack
 
-## What this does
+- Node.js
+- Express.js
+- MongoDB
+- Redis
+- JWT
+- Docker
 
-The API is designed around teams and organizations. It lets users:
+## Running the Application
 
-- sign up and log in with JWT access + refresh tokens
-- manage tasks with permissions for `ADMIN`, `MANAGER`, and `MEMBER`
-- track tasks with priorities, assignees, and due dates
-- enforce task status transitions on the server
-- cache task list results in Redis
+Clone the repository and run:
 
-## What I implemented
-
-### Authentication & Authorization
-
-- `POST /api/auth/register` creates a new organization and admin user
-- `POST /api/auth/login` issues access and refresh tokens
-- `POST /api/auth/refresh-token` rotates refresh tokens
-- middleware handles RBAC cleanly, keeping permission checks out of controller code
-
-### Roles & Permissions
-
-- `ADMIN`: full access, including creating users and deleting tasks
-- `MANAGER`: can create and update tasks, and change task status
-- `MEMBER`: can view tasks and change status only for tasks assigned to them
-
-### Task management
-
-A task includes:
-
-- `title` (required)
-- `description`
-- `priority` (`LOW`, `MEDIUM`, `HIGH`)
-- `status` (`TODO`, `IN_PROGRESS`, `IN_REVIEW`, `DONE`, `BLOCKED`)
-- `assignee` (user reference)
-- `dueDate`
-
-Status transitions are restricted so you can only move tasks along:
-
-- `TODO -> IN_PROGRESS -> IN_REVIEW -> DONE`
-- `BLOCKED` from any active state
-
-And only the assigned user or a `MANAGER` can update a task’s status.
-
-### Task listing
-
-The `GET /api/tasks` endpoint supports:
-
-- pagination using `page` and `limit`
-- filtering by `status`, `priority`, and `assignee`
-
-### Database design
-
-Tasks are stored in MongoDB. I added indexes on:
-
-- `status`
-- `assignee`
-- `dueDate`
-
-These are the fields most frequently used for filtering and should make the task list queries faster.
-
-## Setup
-
-Create a `.env` file in `backend/` with:
-
-```env
-PORT=5000
-MONGO_URI=mongodb://mongo:27017/tasktracker
-REDIS_URL=redis://redis:6379
-JWT_ACCESS_SECRET=your_access_secret
-JWT_REFRESH_SECRET=your_refresh_secret
 ```
-
-Then run:
-
-```bash
-cd backend
 docker compose up --build
 ```
 
-The API will be available at `http://localhost:5000`.
+API runs on:
 
-If you want to run it locally without Docker:
-
-```bash
-cd backend
-npm install
-npm run dev
+```
+http://localhost:5000
 ```
 
-## Endpoints
+To stop containers:
 
-### Auth
+```
+docker compose down
+```
 
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/auth/refresh-token`
+## Postman Collection
+
+Import:
+
+```
+backend/team-task-tracker-collection.postman_collection.json
+
+```
+
+## Roles
+
+### ADMIN
+
+- Manage users
+- Manage tasks
+- Full access
+
+### MANAGER
+
+- Manage tasks
+- Assign tasks
+- Cannot manage users
+
+### MEMBER
+
+- View assigned tasks
+- Update assigned task status
+
+## Main Endpoints
+
+### Authentication
+
+- POST /api/auth/register
+- POST /api/auth/login
+- POST /api/auth/refresh-token
 
 ### Users
 
-- `POST /api/users` (ADMIN only)
+- POST /api/users (Admin only)
 
 ### Tasks
 
-- `POST /api/tasks` (ADMIN, MANAGER)
-- `GET /api/tasks`
-- `GET /api/tasks/:id`
-- `PUT /api/tasks/:id` (ADMIN, MANAGER)
-- `DELETE /api/tasks/:id` (ADMIN)
-- `PATCH /api/tasks/:id/status` (assignee or MANAGER)
+- POST /api/tasks
+- GET /api/tasks
+- GET /api/tasks/:id
+- PUT /api/tasks/:id
+- DELETE /api/tasks/:id
+- PATCH /api/tasks/:id/status
 
-## Redis caching
+### Query Parameters
 
-Task list results are cached with keys like:
+Task listing supports:
 
-- `tasks:all`
-- `tasks:{assignee}`
+- `page`
+- `limit`
+- `status`
+- `priority`
+- `assignee`
 
-The cache is invalidated whenever a task changes:
+## Database Design
 
-- create task
-- update task
-- delete task
-- update task status
+### Collections
 
-That way the task lists stay fresh without doing extra database work for every request.
+**User**
 
-## Design note
+- name
+- email
+- password
+- role
 
-I picked separate indexes on `status`, `assignee`, and `dueDate` because those are the query fields used by the task list endpoint.
-This is a simple way to speed up the most common task lookups without adding unnecessary complexity.
+**Task**
 
-## What I would improve next
+- title
+- description
+- priority
+- status
+- assignee
+- dueDate
 
-- add organization scoping so tasks are always returned only for the user’s org
-- add automated tests for auth, RBAC, and status transitions
-- add an OpenAPI/Swagger spec for the API
-- build a lightweight frontend task board
-- add more validation and better error messages for edge cases
+### Indexes
 
-## Notes
+Indexes added on:
 
-- error responses use the common format from `src/utils/AppError.js`
-- RBAC is enforced in middleware, not inside controllers
-- Redis is used for caching task list queries, MongoDB is the primary datastore
+- status
+- assignee
+- dueDate
+
+### DB Design Decision
+
+Tasks store a reference to the assigned user instead of embedding user data. This avoids duplication and keeps task documents small.
+
+## Task Status Flow
+
+```
+
+TODO → IN_PROGRESS → IN_REVIEW → DONE
+↘
+BLOCKED
+
+```
+
+Status transitions are validated on the server.
+
+## Redis Caching
+
+Task list responses are cached.
+
+Cache keys:
+
+```
+
+tasks:all
+tasks:{assigneeId}
+
+```
+
+Cache is invalidated when:
+
+- A task is created
+- A task is updated
+- A task is deleted
+- A task status changes
+
+## Error Response Format
+
+```
+
+{
+"status": 400,
+"code": "VALIDATION_ERROR",
+"message": "Due date must be a future date"
+}
+
+```
+
+## Future Improvements
+
+If I had more time, I would
+
+- Add frontend integration
+- Add unit and integration tests
+- Implement WebSocket notifications for task status updates.
+
+## Repository Structure
+
+```
+
+backend/
+├─ docker-compose.yml
+├─ dockerfile
+├─ package.json
+├─ README.md
+├─ team-task-tracker-collection.postman_collection.json
+└─ src/
+├─ app.js
+├─ server.js
+├─ config/
+│ ├─ db.js
+│ └─ redis.js
+├─ controllers/
+│ ├─ authController.js
+│ ├─ taskController.js
+│ └─ userController.js
+├─ middleware/
+│ ├─ authMiddleware.js
+│ ├─ errorMiddleware.js
+│ ├─ roleMiddleware.js
+│ └─ taskStatusMiddleware.js
+├─ models/
+│ ├─ organizationModel.js
+│ ├─ refreshTokenModel.js
+│ ├─ taskModel.js
+│ └─ userModel.js
+└─ utils/
+└─ AppError.js
+```
