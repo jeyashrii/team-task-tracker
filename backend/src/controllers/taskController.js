@@ -7,6 +7,13 @@ const createTask = asyncHandler(async (req, res) => {
   if (!title.trim()) {
     throw new AppError(400, "VALIDATION_ERROR", "Title is required");
   }
+  if (dueDate && new Date(dueDate) < new date()) {
+    throw new AppError(
+      400,
+      "VALIDATION_ERROR",
+      "Due date must be a future date",
+    );
+  }
 
   const task = await Task.create({
     title: title.trim(),
@@ -71,6 +78,15 @@ const updateTask = asyncHandler(async (req, res) => {
   if (!task) {
     throw new AppError(404, "TASK_NOT_FOUND", "Task not found");
   }
+  const { dueDate } = req.body;
+  if (dueDate && new Date(dueDate) < new Date()) {
+    throw new AppError(
+      400,
+      "VALIDATION_ERROR",
+      "Due date must be a future date",
+    );
+  }
+
   Object.assign(task, req.body);
   await task.save();
   res.status(200).json({
