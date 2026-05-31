@@ -2,12 +2,14 @@ const asyncHandler = require("express-async-handler");
 const Task = require("../models/taskModel");
 const AppError = require("../utils/AppError");
 
+const redisClient = require("../config/redis");
+
 const createTask = asyncHandler(async (req, res) => {
   const { title, description, priority, assignee, dueDate } = req.body;
   if (!title.trim()) {
     throw new AppError(400, "VALIDATION_ERROR", "Title is required");
   }
-  if (dueDate && new Date(dueDate) < new date()) {
+  if (dueDate && new Date(dueDate) < new Date()) {
     throw new AppError(
       400,
       "VALIDATION_ERROR",
@@ -22,7 +24,7 @@ const createTask = asyncHandler(async (req, res) => {
     assignee,
     dueDate,
   });
-
+  await redisClient.del(`tasks:${assignee}`);
   return res.status(201).json({
     success: true,
     message: "Task created successfully",
@@ -33,6 +35,11 @@ const createTask = asyncHandler(async (req, res) => {
 const getTasks = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, status, priority, assignee } = req.query;
   const filters = {};
+  const cacheKey = assignee ? `tasks:${assignee}` : `tasks:all`;
+  const cachedTasks = await redisClient.get(cacheKey);
+  if (cachedTasks) {
+    return res.status(200).json(JSON.parse(cachedTasks));
+  }
   if (status) {
     filters.status = status;
   }
@@ -49,9 +56,19 @@ const getTasks = asyncHandler(async (req, res) => {
     .populate("assignee", "name email role");
 
   const totalTasks = await Task.countDocuments(filters);
+  const response = {
+    success: true,
+    totalTasks,
+    currentPage: Number(page),
+    totalPages: Math.ceil(totalTasks / limit),
+    data: tasks,
+  };
 
+  await redisClient.set(cacheKey, JSON.stringify(response), {
+    EX: 300,
+  });
   return res.status(200).json({
-    sucess: true,
+    success: true,
     totalTasks,
     currentPage: Number(page),
     totalPages: Math.ceil(totalTasks / limit),
@@ -89,6 +106,7 @@ const updateTask = asyncHandler(async (req, res) => {
 
   Object.assign(task, req.body);
   await task.save();
+  await redisClient.del(`tasks:${task.assignee}`);
   res.status(200).json({
     success: true,
     message: "Task updated successfully",
@@ -102,6 +120,7 @@ const deleteTask = asyncHandler(async (req, res) => {
     throw new AppError(404, "TASK_NOT_FOUND", "Task not found");
   }
   await task.deleteOne();
+  await redisClient.del(`tasks:${task.assignee}`);
   res.status(200).json({
     success: true,
     message: "Task deleted successfully",
@@ -130,6 +149,7 @@ const changeTaskStatus = asyncHandler(async (req, res) => {
   }
   task.status = status;
   await task.save();
+  await redisClient.del(`tasks:${task.assignee}`);
 
   res.status(200).json({
     success: true,
