@@ -1,9 +1,10 @@
 const asyncHandler = require("express-async-handler");
+const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const Organization = require("../models/organizationModel");
 
 const AppError = require("../utils/AppError");
-
+const RefreshToken = require("../models/refreshTokenModel");
 const { createAccessToken, createRefreshToken } = require("../utils/jwt");
 
 const registerUser = asyncHandler(async (req, res) => {
@@ -46,6 +47,10 @@ const registerUser = asyncHandler(async (req, res) => {
   const accessToken = createAccessToken(user._id, user.role);
 
   const refreshToken = createRefreshToken(user._id);
+  await RefreshToken.create({
+    user: user._id,
+    token: refreshToken,
+  });
 
   return res.status(201).json({
     success: true,
@@ -85,6 +90,10 @@ const loginUser = asyncHandler(async (req, res) => {
   }
   const accessToken = createAccessToken(user._id, user.role);
   const refreshToken = createRefreshToken(user._id);
+  await RefreshToken.create({
+    user: user._id,
+    token: refreshToken,
+  });
 
   return res.status(200).json({
     success: true,
@@ -101,7 +110,42 @@ const loginUser = asyncHandler(async (req, res) => {
     },
   });
 });
+const rotateRefreshToken = asyncHandler(async (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) {
+    throw new AppError(400, "VALIDATION_ERROR", "Refresh token is missing");
+  }
+
+  const storedToken = await RefreshToken.findOne({
+    token: refreshToken,
+  });
+
+  if (!storedToken) {
+    throw new AppError(400, "INVALID_TOKEN", "Refresh token is invalid");
+  }
+  const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+  await storedToken.deleteOne();
+  const user = await User.findById(decoded.userId);
+  const newAccessToken = createAccessToken(user._id, user.role);
+
+  const newRefreshToken = createRefreshToken(decoded.userId);
+
+  await RefreshToken.create({
+    user: decoded.userId,
+    token: newRefreshToken,
+  });
+
+  res.status(200).json({
+    success: true,
+    data: {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    },
+  });
+});
 module.exports = {
   registerUser,
   loginUser,
+  rotateRefreshToken,
 };
