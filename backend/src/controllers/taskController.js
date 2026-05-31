@@ -5,7 +5,7 @@ const AppError = require("../utils/AppError");
 const createTask = asyncHandler(async (req, res) => {
   const { title, description, priority, assignee, dueDate } = req.body;
   if (!title.trim()) {
-    throw new AppError(400, "VALIDATION ERROR", "Title is required");
+    throw new AppError(400, "VALIDATION_ERROR", "Title is required");
   }
 
   const task = await Task.create({
@@ -15,7 +15,6 @@ const createTask = asyncHandler(async (req, res) => {
     assignee,
     dueDate,
   });
-  console.log(task);
 
   return res.status(201).json({
     success: true,
@@ -25,7 +24,7 @@ const createTask = asyncHandler(async (req, res) => {
 });
 
 const getTasks = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, status, priority, asignee } = req.query;
+  const { page = 1, limit = 10, status, priority, assignee } = req.query;
   const filters = {};
   if (status) {
     filters.status = status;
@@ -33,8 +32,8 @@ const getTasks = asyncHandler(async (req, res) => {
   if (priority) {
     filters.priority = priority;
   }
-  if (asignee) {
-    filters.asignee = asignee;
+  if (assignee) {
+    filters.assignee = assignee;
   }
 
   const tasks = await Task.find(filters)
@@ -58,7 +57,7 @@ const getTaskById = asyncHandler(async (req, res) => {
 
   const task = await Task.findById(id);
   if (!task) {
-    throw new AppError(404, "TASK NOT FOUND", "Task not found");
+    throw new AppError(404, "TASK_NOT_FOUND", "Task not found");
   }
 
   res.status(200).json({
@@ -70,7 +69,7 @@ const getTaskById = asyncHandler(async (req, res) => {
 const updateTask = asyncHandler(async (req, res) => {
   const task = await Task.findById(req.params.id);
   if (!task) {
-    throw new AppError(404, "TASK NOT FOUND", "Task not found");
+    throw new AppError(404, "TASK_NOT_FOUND", "Task not found");
   }
   Object.assign(task, req.body);
   await task.save();
@@ -84,7 +83,7 @@ const updateTask = asyncHandler(async (req, res) => {
 const deleteTask = asyncHandler(async (req, res) => {
   const task = await Task.findById(req.params.id);
   if (!task) {
-    throw new AppError(404, "TASK NOT FOUND", "Task not found");
+    throw new AppError(404, "TASK_NOT_FOUND", "Task not found");
   }
   await task.deleteOne();
   res.status(200).json({
@@ -92,4 +91,41 @@ const deleteTask = asyncHandler(async (req, res) => {
     message: "Task deleted successfully",
   });
 });
-module.exports = { createTask, getTasks, getTaskById, updateTask, deleteTask };
+
+const changeTaskStatus = asyncHandler(async (req, res) => {
+  const { status } = req.body;
+
+  const task = req.task;
+  const statusProgress = {
+    TODO: ["IN_PROGRESS", "BLOCKED"],
+    IN_PROGRESS: ["IN_REVIEW", "BLOCKED"],
+    IN_REVIEW: ["DONE", "BLOCKED"],
+    DONE: [],
+    BLOCKED: [],
+  };
+  const allowedStatuses = statusProgress[task.status];
+
+  if (!allowedStatuses.includes(status)) {
+    throw new AppError(
+      400,
+      "INVALID_STATUS_MOVE",
+      `Cannot move task from ${task.status} to ${status}`,
+    );
+  }
+  task.status = status;
+  await task.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Updated task status",
+    task,
+  });
+});
+module.exports = {
+  createTask,
+  getTasks,
+  getTaskById,
+  updateTask,
+  deleteTask,
+  changeTaskStatus,
+};

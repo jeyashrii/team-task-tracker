@@ -19,7 +19,8 @@ const authenticateUser = asyncHandler(async (req, res, next) => {
     throw new AppError(401, "UNAUTHORIZED", "User not found");
   }
   req.user = user;
+
   next();
 });
 
-module.exports = { authenticateUser };
+module.exports = authenticateUser;

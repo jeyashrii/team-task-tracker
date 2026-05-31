@@ -17,7 +17,7 @@ const registerUser = asyncHandler(async (req, res) => {
   ) {
     throw new AppError(
       400,
-      "VALIDATION ERROR",
+      "VALIDATION_ERROR",
       "Please enter all required fields",
     );
   }
@@ -68,7 +68,7 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!email || !password) {
     throw new AppError(
       400,
-      "VALIDATION ERROR",
+      "VALIDATION_ERROR",
       "Email and password are required",
     );
   }
@@ -77,15 +77,11 @@ const loginUser = asyncHandler(async (req, res) => {
   });
 
   if (!user) {
-    throw new AppError(401, "INVALID CREDENTIALS", "Invalid email or password");
+    throw new AppError(401, "INVALID_CREDENTIALS", "Invalid email or password");
   }
   const isPasswordMatch = await user.comparePassword(password);
   if (!isPasswordMatch) {
-    throw new AppError(
-      401,
-      "INVALID CRFEDENTIALS",
-      "Invalid email or password",
-    );
+    throw new AppError(401, "INVALID_CREDENTIALS", "Invalid email or password");
   }
   const accessToken = createAccessToken(user._id, user.role);
   const refreshToken = createRefreshToken(user._id);
